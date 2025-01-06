@@ -1,6 +1,8 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "translate") {
     try {
+      console.log("Translate action received in content script.");
+
       // Extract post title and content
       const postTitleElement = document.querySelector('h1._eYtD2XCVieq6emjKBH3m');
       const postContentElement = document.querySelector('div[data-test-id="post-content"]');
@@ -9,7 +11,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const postContent = postContentElement ? postContentElement.innerText : '[No Content]';
 
       // Extract comments
-      const commentElements = document.querySelectorAll('div.Comment');
+      const commentElements = document.querySelectorAll('div[data-test-id="comment"]');
       const comments = [];
       commentElements.forEach((el) => {
         const author = el.querySelector('a[data-click-id="user"]')?.innerText || '[deleted]';
@@ -17,10 +19,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         comments.push({ author, commentBody });
       });
 
+      console.log(`Extracted ${comments.length} comments.`);
+
       // Send data to background script for translation
       chrome.runtime.sendMessage(
         { action: "translateContent", data: { postTitle, postContent, comments } },
         (response) => {
+          console.log("Received response from background script:", response);
           if (response.status === "Translation successful!" && response.translatedData) {
             // Update the page with translated content
             const { translatedPostTitle, translatedPostContent, translatedComments } = response.translatedData;
@@ -45,8 +50,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             // Notify the user (optional)
             alert("Reddit post and comments have been translated to English!");
+
+            // Send response back to popup
+            sendResponse({ status: "Translation successful!" });
           } else {
             alert(response.status);
+            sendResponse({ status: response.status });
           }
         }
       );
