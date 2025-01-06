@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Reddit Translator",
+  "version": "1.0",
+  "description": "Scrapes Reddit posts and comments, then translates them using Google Gemini API.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.reddit.com/*"],
+      "js": ["contentScript.js"]
+    }
+  ]
+}
