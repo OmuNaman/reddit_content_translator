@@ -1,4 +1,17 @@
-"background": {
-  "service_worker": "dist/background.bundle.js",
-  "type": "module"
-},
+{
+  "manifest_version": 3,
+  "name": "Reddit Translator",
+  "version": "1.0",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["*://*.reddit.com/*"],
+  "background": {
+    "service_worker": "background.bundle.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "web_accessible_resources": [{
+    "resources": ["*.js"],
+    "matches": ["<all_urls>"]
+  }]
+}
